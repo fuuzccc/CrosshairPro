@@ -4,6 +4,7 @@ using CrosshairPro.Core.Services;
 using CrosshairPro.Core.Models;
 using System.Collections.ObjectModel;
 using CrosshairPro.App.Helpers;
+using Avalonia.Controls.ApplicationLifetimes;
 
 namespace CrosshairPro.App.ViewModels;
 
@@ -478,6 +479,29 @@ public partial class MainViewModel : ObservableObject
         OnPropertyChanged(nameof(IsLongPressMode));
         OnPropertyChanged(nameof(HotkeyClickCount));
         StatusMessage = "设置已重置为默认值";
+    }
+
+    [RelayCommand]
+    private void UninstallApp()
+    {
+        try
+        {
+            var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            var settingsDir = Path.Combine(appDataPath, "CrosshairPro");
+
+            if (Directory.Exists(settingsDir))
+            {
+                Directory.Delete(settingsDir, true);
+            }
+        }
+        catch
+        {
+        }
+
+        if (App.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        {
+            desktop.Shutdown();
+        }
     }
 
     private void OnRightButtonLongPressed(object? sender, EventArgs e)

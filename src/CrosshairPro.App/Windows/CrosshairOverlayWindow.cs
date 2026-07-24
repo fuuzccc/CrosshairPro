@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
+using Avalonia.Platform;
 using CrosshairPro.Core.Models;
 using CrosshairPro.App.Controls;
 using CrosshairPro.App.Helpers;
@@ -71,8 +72,19 @@ public class CrosshairOverlayWindow : Window
         if (handle == null || handle.Handle == IntPtr.Zero)
             return;
 
-        int screenWidth = Win32Api.GetSystemMetrics(Win32Api.SM_CXSCREEN);
-        int screenHeight = Win32Api.GetSystemMetrics(Win32Api.SM_CYSCREEN);
+        var screen = Screens?.Primary;
+        if (screen == null)
+            return;
+
+        var dpi = screen.Scaling;
+        int physicalWidth = (int)(screen.Bounds.Width * dpi);
+        int physicalHeight = (int)(screen.Bounds.Height * dpi);
+        int physicalX = (int)(screen.Bounds.X * dpi);
+        int physicalY = (int)(screen.Bounds.Y * dpi);
+
+        Width = screen.Bounds.Width;
+        Height = screen.Bounds.Height;
+        Position = new PixelPoint(screen.Bounds.X, screen.Bounds.Y);
 
         int exStyle = Win32Api.GetWindowLong(handle.Handle, Win32Api.GWL_EXSTYLE);
         Win32Api.SetWindowLong(handle.Handle, Win32Api.GWL_EXSTYLE,
@@ -85,8 +97,8 @@ public class CrosshairOverlayWindow : Window
         Win32Api.SetWindowPos(
             handle.Handle,
             new IntPtr(-1),
-            0, 0,
-            screenWidth, screenHeight,
+            physicalX, physicalY,
+            physicalWidth, physicalHeight,
             Win32Api.SWP_NOACTIVATE);
     }
 

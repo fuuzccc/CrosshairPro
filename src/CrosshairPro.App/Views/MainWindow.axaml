@@ -320,6 +320,16 @@
                         Background="{DynamicResource AppDangerColor}" Foreground="White" HorizontalAlignment="Left"/>
               </StackPanel>
             </Border>
+
+            <!-- 卸载 -->
+            <Border Background="{DynamicResource AppSurfaceBackground}" CornerRadius="8" Padding="15">
+              <StackPanel Spacing="12">
+                <TextBlock Text="卸载" FontWeight="SemiBold" FontSize="14"/>
+                <TextBlock Text="删除所有设置数据并退出程序" Foreground="{DynamicResource AppTextMuted}" FontSize="12"/>
+                <Button Content="彻底卸载并退出" Command="{Binding UninstallAppCommand}"
+                        Background="{DynamicResource AppDangerColor}" Foreground="White" HorizontalAlignment="Left"/>
+              </StackPanel>
+            </Border>
           </StackPanel>
         </ScrollViewer>
       </TabItem>
