@@ -44,5 +44,7 @@ public class AppSettings
 
     public bool EnableMouseHook { get; set; } = true;
 
+    public bool EnableDragCrosshair { get; set; } = true;
+
     public string Language { get; set; } = "zh-CN";
 }

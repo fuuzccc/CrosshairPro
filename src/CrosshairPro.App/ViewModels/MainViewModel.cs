@@ -30,7 +30,7 @@ public partial class MainViewModel : ObservableObject
     public IReadOnlyList<CrosshairPreset> CustomPresets { get; }
 
     public ObservableCollection<string> MonitorOptions { get; } = new() { "主显示器" };
-    public ObservableCollection<string> ThemeOptions { get; } = new() { "深色", "浅色" };
+    public ObservableCollection<string> ThemeOptions { get; } = new() { "深色", "浅色", "明日方舟" };
     public ObservableCollection<string> LanguageOptions { get; } = new() { "简体中文", "English" };
     public ObservableCollection<string> TriggerModeOptions { get; } = new() { "长按", "短按", "双击" };
 
@@ -39,7 +39,7 @@ public partial class MainViewModel : ObservableObject
 
     public string DeveloperName => "fuuzccc";
     public string DeveloperGithub => "https://github.com/fuuzccc";
-    public string AppVersion => "v1.4.4";
+    public string AppVersion => "v1.5.0";
 
     public bool MinimizeToTray
     {
@@ -115,6 +115,54 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
+    public bool EnableDragCrosshair
+    {
+        get => _settingsService.Settings.EnableDragCrosshair;
+        set
+        {
+            _settingsService.UpdateAppSettings(s => s.EnableDragCrosshair = value);
+            OnPropertyChanged();
+            StatusMessage = value ? "拖动调整准星已启用" : "拖动调整准星已关闭";
+        }
+    }
+
+    public float CrosshairOffsetX
+    {
+        get => _settingsService.Settings.Crosshair.OffsetX;
+        set
+        {
+            _settingsService.UpdateAppSettings(s => s.Crosshair.OffsetX = value);
+            OnPropertyChanged();
+            _crosshairService.UpdateSettings(_settingsService.Settings.Crosshair);
+        }
+    }
+
+    public float CrosshairOffsetY
+    {
+        get => _settingsService.Settings.Crosshair.OffsetY;
+        set
+        {
+            _settingsService.UpdateAppSettings(s => s.Crosshair.OffsetY = value);
+            OnPropertyChanged();
+            _crosshairService.UpdateSettings(_settingsService.Settings.Crosshair);
+        }
+    }
+
+    [RelayCommand]
+    private void ResetCrosshairPosition()
+    {
+        _settingsService.UpdateAppSettings(s =>
+        {
+            s.Crosshair.OffsetX = 0;
+            s.Crosshair.OffsetY = 0;
+        });
+        OnPropertyChanged(nameof(CrosshairOffsetX));
+        OnPropertyChanged(nameof(CrosshairOffsetY));
+        _crosshairService.UpdateSettings(_settingsService.Settings.Crosshair);
+        StatusMessage = "准星位置已重置到屏幕中心";
+    }
+
+
     public double WindowOpacity
     {
         get => _settingsService.Settings.WindowOpacity;
@@ -149,13 +197,34 @@ public partial class MainViewModel : ObservableObject
 
     public int SelectedThemeIndex
     {
-        get => _settingsService.Settings.Theme == "Dark" ? 0 : 1;
+        get => _settingsService.Settings.Theme switch
+        {
+            "Dark" => 0,
+            "Light" => 1,
+            "Arknights" => 2,
+            _ => 0
+        };
         set
         {
-            var theme = value == 0 ? "Dark" : "Light";
+            var theme = value switch
+            {
+                0 => "Dark",
+                1 => "Light",
+                2 => "Arknights",
+                _ => "Dark"
+            };
             _settingsService.UpdateAppSettings(s => s.Theme = theme);
             OnPropertyChanged();
-            StatusMessage = "主题已更改，重启后生效";
+            ApplyTheme(theme);
+            StatusMessage = "主题已更改";
+        }
+    }
+
+    private void ApplyTheme(string theme)
+    {
+        if (App.Current is App app)
+        {
+            app.ApplyTheme(theme);
         }
     }
 
@@ -374,6 +443,9 @@ public partial class MainViewModel : ObservableObject
         OnPropertyChanged(nameof(StartMinimized));
         OnPropertyChanged(nameof(AutoStart));
         OnPropertyChanged(nameof(EnableMouseHook));
+        OnPropertyChanged(nameof(EnableDragCrosshair));
+        OnPropertyChanged(nameof(CrosshairOffsetX));
+        OnPropertyChanged(nameof(CrosshairOffsetY));
         OnPropertyChanged(nameof(WindowOpacity));
         OnPropertyChanged(nameof(CrosshairScale));
         OnPropertyChanged(nameof(RightClickHoldThresholdMs));

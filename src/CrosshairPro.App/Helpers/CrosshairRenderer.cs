@@ -10,8 +10,8 @@ public static class CrosshairRenderer
 
     public static void Render(DrawingContext context, CrosshairSettings settings, Size renderSize, double scale = 1.0)
     {
-        var centerX = renderSize.Width / 2;
-        var centerY = renderSize.Height / 2;
+        var centerX = renderSize.Width / 2 + settings.OffsetX * scale;
+        var centerY = renderSize.Height / 2 + settings.OffsetY * scale;
 
         var (r, g, b) = settings.ActualColor;
         var alpha = settings.Alpha / 255.0;

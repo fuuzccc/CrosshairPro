@@ -56,6 +56,10 @@ public class CrosshairSettings
 
     public float SniperWidth { get; set; } = 1f;
 
+    public float OffsetX { get; set; } = 0f;
+
+    public float OffsetY { get; set; } = 0f;
+
     [JsonIgnore]
     public (byte R, byte G, byte B) ActualColor
     {

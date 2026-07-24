@@ -19,6 +19,14 @@ public class WindowsHookService : IMouseHookService
     private DateTime _lastClickTime = DateTime.MinValue;
     private int _clickCount;
 
+    private bool _isDragging;
+    private bool _hasDragged;
+    private int _dragStartX;
+    private int _dragStartY;
+    private float _dragStartOffsetX;
+    private float _dragStartOffsetY;
+    private const int DragThreshold = 5;
+
     public bool IsHookInstalled => _mouseHookId != IntPtr.Zero || _keyboardHookId != IntPtr.Zero;
 
     public event EventHandler? RightButtonLongPressed;
@@ -101,9 +109,18 @@ public class WindowsHookService : IMouseHookService
                     break;
             }
 
-            if ((uint)wParam == downMsg)
+            if ((uint)wParam == Win32Api.WM_MOUSEMOVE)
             {
-                HandleButtonDown();
+                if (_isDragging)
+                {
+                    var mouseStruct = Marshal.PtrToStructure<Win32Api.MSLLHOOKSTRUCT>(lParam);
+                    HandleDragMove(mouseStruct.pt.x, mouseStruct.pt.y);
+                }
+            }
+            else if ((uint)wParam == downMsg)
+            {
+                var mouseStruct = Marshal.PtrToStructure<Win32Api.MSLLHOOKSTRUCT>(lParam);
+                HandleButtonDown(mouseStruct.pt.x, mouseStruct.pt.y);
             }
             else if ((uint)wParam == upMsg)
             {
@@ -158,12 +175,23 @@ public class WindowsHookService : IMouseHookService
         };
     }
 
-    private void HandleButtonDown()
+    private void HandleButtonDown(int x = 0, int y = 0)
     {
         _isButtonDown = true;
         _hasTriggeredLongPress = false;
         _buttonStopwatch?.Restart();
         RightButtonPressed?.Invoke(this, EventArgs.Empty);
+
+        if (_settingsService.Settings.EnableDragCrosshair &&
+            _settingsService.Settings.IsCrosshairEnabled)
+        {
+            _isDragging = true;
+            _hasDragged = false;
+            _dragStartX = x;
+            _dragStartY = y;
+            _dragStartOffsetX = _settingsService.Settings.Crosshair.OffsetX;
+            _dragStartOffsetY = _settingsService.Settings.Crosshair.OffsetY;
+        }
 
         var triggerMode = _settingsService.Settings.HotkeyTriggerMode;
         if (triggerMode == "LongPress")
@@ -178,6 +206,12 @@ public class WindowsHookService : IMouseHookService
         _buttonStopwatch?.Stop();
         RightButtonReleased?.Invoke(this, EventArgs.Empty);
 
+        if (_isDragging)
+        {
+            _isDragging = false;
+            _settingsService.Save();
+        }
+
         var triggerMode = _settingsService.Settings.HotkeyTriggerMode;
         if (triggerMode == "ShortPress")
         {
@@ -189,8 +223,29 @@ public class WindowsHookService : IMouseHookService
         }
     }
 
+    private void HandleDragMove(int x, int y)
+    {
+        if (!_isDragging) return;
+
+        var dx = x - _dragStartX;
+        var dy = y - _dragStartY;
+
+        if (!_hasDragged && (Math.Abs(dx) > DragThreshold || Math.Abs(dy) > DragThreshold))
+        {
+            _hasDragged = true;
+        }
+
+        _settingsService.UpdateAppSettings(s =>
+        {
+            s.Crosshair.OffsetX = _dragStartOffsetX + dx;
+            s.Crosshair.OffsetY = _dragStartOffsetY + dy;
+        });
+    }
+
     private void CheckShortPress()
     {
+        if (_hasDragged) return;
+
         var threshold = _settingsService.Settings.RightClickHoldThresholdMs;
         if (_buttonStopwatch?.ElapsedMilliseconds < threshold)
         {
@@ -200,6 +255,8 @@ public class WindowsHookService : IMouseHookService
 
     private void CheckDoubleClick()
     {
+        if (_hasDragged) return;
+
         var now = DateTime.Now;
         var doubleClickThreshold = 300;
 
@@ -228,7 +285,7 @@ public class WindowsHookService : IMouseHookService
         {
             await Task.Delay(threshold);
 
-            if (_isButtonDown && IsHookInstalled && !_hasTriggeredLongPress)
+            if (_isButtonDown && IsHookInstalled && !_hasTriggeredLongPress && !_hasDragged)
             {
                 _hasTriggeredLongPress = true;
                 RightButtonLongPressed?.Invoke(this, EventArgs.Empty);

@@ -1,0 +1,159 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Styles.Resources>
+        <Color x:Key="ArknightsBackgroundColor">#FF0A0E17</Color>
+        <Color x:Key="ArknightsSurfaceColor">#FF111827</Color>
+        <Color x:Key="ArknightsSurfaceLightColor">#FF1A2332</Color>
+        <Color x:Key="ArknightsBorderColor">#FF2D3F54</Color>
+        <Color x:Key="ArknightsAccentColor">#FF00D4FF</Color>
+        <Color x:Key="ArknightsAccentLightColor">#FF67E8F9</Color>
+        <Color x:Key="ArknightsAccentDarkColor">#FF0891B2</Color>
+        <Color x:Key="ArknightsTextPrimaryColor">#FFE2E8F0</Color>
+        <Color x:Key="ArknightsTextSecondaryColor">#FF94A3B8</Color>
+        <Color x:Key="ArknightsTextMutedColor">#FF64748B</Color>
+        <Color x:Key="ArknightsGoldColor">#FFFCD34D</Color>
+        <Color x:Key="ArknightsDangerColor">#FFEF4444</Color>
+        <Color x:Key="ArknightsSuccessColor">#FF22C55E</Color>
+
+        <SolidColorBrush x:Key="ArknightsBackgroundBrush" Color="{StaticResource ArknightsBackgroundColor}" />
+        <SolidColorBrush x:Key="ArknightsSurfaceBrush" Color="{StaticResource ArknightsSurfaceColor}" />
+        <SolidColorBrush x:Key="ArknightsSurfaceLightBrush" Color="{StaticResource ArknightsSurfaceLightColor}" />
+        <SolidColorBrush x:Key="ArknightsBorderBrush" Color="{StaticResource ArknightsBorderColor}" />
+        <SolidColorBrush x:Key="ArknightsAccentBrush" Color="{StaticResource ArknightsAccentColor}" />
+        <SolidColorBrush x:Key="ArknightsAccentLightBrush" Color="{StaticResource ArknightsAccentLightColor}" />
+        <SolidColorBrush x:Key="ArknightsAccentDarkBrush" Color="{StaticResource ArknightsAccentDarkColor}" />
+        <SolidColorBrush x:Key="ArknightsTextPrimaryBrush" Color="{StaticResource ArknightsTextPrimaryColor}" />
+        <SolidColorBrush x:Key="ArknightsTextSecondaryBrush" Color="{StaticResource ArknightsTextSecondaryColor}" />
+        <SolidColorBrush x:Key="ArknightsTextMutedBrush" Color="{StaticResource ArknightsTextMutedColor}" />
+        <SolidColorBrush x:Key="ArknightsGoldBrush" Color="{StaticResource ArknightsGoldColor}" />
+        <SolidColorBrush x:Key="ArknightsDangerBrush" Color="{StaticResource ArknightsDangerColor}" />
+        <SolidColorBrush x:Key="ArknightsSuccessBrush" Color="{StaticResource ArknightsSuccessColor}" />
+    </Styles.Resources>
+
+    <Style Selector="Window">
+        <Setter Property="Background" Value="{StaticResource ArknightsBackgroundBrush}" />
+        <Setter Property="Foreground" Value="{StaticResource ArknightsTextPrimaryBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource ArknightsBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+    </Style>
+
+    <Style Selector="Border">
+        <Setter Property="BorderBrush" Value="{StaticResource ArknightsBorderBrush}" />
+    </Style>
+
+    <Style Selector="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource ArknightsTextPrimaryBrush}" />
+    </Style>
+
+    <Style Selector="Button">
+        <Setter Property="Background" Value="{StaticResource ArknightsSurfaceLightColor}" />
+        <Setter Property="Foreground" Value="{StaticResource ArknightsTextPrimaryBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource ArknightsBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="15,8" />
+        <Setter Property="CornerRadius" Value="0" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Cursor" Value="Hand" />
+    </Style>
+
+    <Style Selector="Button:pointerover">
+        <Setter Property="Background" Value="#FF1E3A5F" />
+        <Setter Property="BorderBrush" Value="{StaticResource ArknightsAccentColor}" />
+    </Style>
+
+    <Style Selector="Button:pressed">
+        <Setter Property="Background" Value="#FF0F172A" />
+    </Style>
+
+    <Style Selector="Button.Accent">
+        <Setter Property="Background" Value="{StaticResource ArknightsAccentColor}" />
+        <Setter Property="Foreground" Value="#FF0F172A" />
+        <Setter Property="BorderBrush" Value="{StaticResource ArknightsAccentColor}" />
+    </Style>
+
+    <Style Selector="Button.Accent:pointerover">
+        <Setter Property="Background" Value="{StaticResource ArknightsAccentLightColor}" />
+        <Setter Property="Foreground" Value="#FF0F172A" />
+    </Style>
+
+    <Style Selector="CheckBox">
+        <Setter Property="Foreground" Value="{StaticResource ArknightsTextPrimaryBrush}" />
+    </Style>
+
+    <Style Selector="Slider">
+        <Setter Property="Foreground" Value="{StaticResource ArknightsAccentColor}" />
+        <Setter Property="BorderBrush" Value="{StaticResource ArknightsBorderBrush}" />
+    </Style>
+
+    <Style Selector="TextBox">
+        <Setter Property="Background" Value="{StaticResource ArknightsSurfaceColor}" />
+        <Setter Property="Foreground" Value="{StaticResource ArknightsTextPrimaryBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource ArknightsBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="8,6" />
+        <Setter Property="CornerRadius" Value="0" />
+    </Style>
+
+    <Style Selector="TextBox:focus">
+        <Setter Property="BorderBrush" Value="{StaticResource ArknightsAccentColor}" />
+    </Style>
+
+    <Style Selector="ComboBox">
+        <Setter Property="Background" Value="{StaticResource ArknightsSurfaceColor}" />
+        <Setter Property="Foreground" Value="{StaticResource ArknightsTextPrimaryBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource ArknightsBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="0" />
+        <Setter Property="Padding" Value="8,4" />
+    </Style>
+
+    <Style Selector="ComboBox:focus">
+        <Setter Property="BorderBrush" Value="{StaticResource ArknightsAccentColor}" />
+    </Style>
+
+    <Style Selector="ComboBoxItem">
+        <Setter Property="Background" Value="{StaticResource ArknightsSurfaceColor}" />
+        <Setter Property="Foreground" Value="{StaticResource ArknightsTextPrimaryBrush}" />
+        <Setter Property="Padding" Value="8,4" />
+    </Style>
+
+    <Style Selector="ComboBoxItem:pointerover">
+        <Setter Property="Background" Value="#FF1E3A5F" />
+    </Style>
+
+    <Style Selector="TabControl">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+
+    <Style Selector="TabItem">
+        <Setter Property="Foreground" Value="{StaticResource ArknightsTextSecondaryBrush}" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Padding" Value="20,10" />
+        <Setter Property="Margin" Value="0,0,2,0" />
+    </Style>
+
+    <Style Selector="TabItem:selected">
+        <Setter Property="Foreground" Value="{StaticResource ArknightsAccentColor}" />
+        <Setter Property="BorderBrush" Value="{StaticResource ArknightsAccentColor}" />
+        <Setter Property="BorderThickness" Value="0,0,0,2" />
+    </Style>
+
+    <Style Selector="TabItem:pointerover">
+        <Setter Property="Foreground" Value="{StaticResource ArknightsTextPrimaryBrush}" />
+    </Style>
+
+    <Style Selector="ScrollViewer">
+        <Setter Property="Background" Value="Transparent" />
+    </Style>
+
+    <Style Selector="ScrollBar">
+        <Setter Property="Background" Value="{StaticResource ArknightsSurfaceColor}" />
+    </Style>
+
+    <Style Selector="ItemsControl">
+        <Setter Property="Background" Value="Transparent" />
+    </Style>
+
+</Styles>

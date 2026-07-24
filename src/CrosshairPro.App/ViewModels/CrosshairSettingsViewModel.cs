@@ -53,6 +53,12 @@ public partial class CrosshairSettingsViewModel : ObservableObject
     [ObservableProperty]
     private float _sniperWidth;
 
+    [ObservableProperty]
+    private float _offsetX;
+
+    [ObservableProperty]
+    private float _offsetY;
+
     public CrosshairSettingsViewModel()
     {
     }
@@ -75,6 +81,8 @@ public partial class CrosshairSettingsViewModel : ObservableObject
         OutlineThickness = settings.OutlineThickness;
         FollowRecoil = settings.FollowRecoil;
         SniperWidth = settings.SniperWidth;
+        OffsetX = settings.OffsetX;
+        OffsetY = settings.OffsetY;
     }
 
     public CrosshairSettings ToModel()
@@ -96,7 +104,9 @@ public partial class CrosshairSettingsViewModel : ObservableObject
             HasOutline = HasOutline,
             OutlineThickness = OutlineThickness,
             FollowRecoil = FollowRecoil,
-            SniperWidth = SniperWidth
+            SniperWidth = SniperWidth,
+            OffsetX = OffsetX,
+            OffsetY = OffsetY
         };
     }
 }
