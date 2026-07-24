@@ -41,16 +41,7 @@ public class CrosshairOverlayWindow : Window
             IsHitTestVisible = false
         };
 
-        var panel = new Panel
-        {
-            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
-            VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch,
-            IsHitTestVisible = false,
-            Margin = new Thickness(0)
-        };
-
-        panel.Children.Add(_crosshairOverlay);
-        Content = panel;
+        Content = _crosshairOverlay;
 
         _crosshairOverlay.Bind(CrosshairOverlay.SettingsProperty,
             this.GetObservable(CrosshairSettingsProperty));
@@ -63,11 +54,40 @@ public class CrosshairOverlayWindow : Window
         try
         {
             WindowHelper.MakeClickThrough(this);
+            PositionOverlayFullscreen();
             _crosshairOverlay.InvalidateVisual();
         }
         catch
         {
         }
+    }
+
+    private void PositionOverlayFullscreen()
+    {
+        if (!OperatingSystem.IsWindows())
+            return;
+
+        var handle = this.TryGetPlatformHandle();
+        if (handle == null || handle.Handle == IntPtr.Zero)
+            return;
+
+        int screenWidth = Win32Api.GetSystemMetrics(Win32Api.SM_CXSCREEN);
+        int screenHeight = Win32Api.GetSystemMetrics(Win32Api.SM_CYSCREEN);
+
+        int exStyle = Win32Api.GetWindowLong(handle.Handle, Win32Api.GWL_EXSTYLE);
+        Win32Api.SetWindowLong(handle.Handle, Win32Api.GWL_EXSTYLE,
+            exStyle | Win32Api.WS_EX_TRANSPARENT | Win32Api.WS_EX_LAYERED | Win32Api.WS_EX_TOOLWINDOW);
+
+        int style = Win32Api.GetWindowLong(handle.Handle, Win32Api.GWL_STYLE);
+        Win32Api.SetWindowLong(handle.Handle, Win32Api.GWL_STYLE,
+            unchecked((int)(Win32Api.WS_POPUP | Win32Api.WS_VISIBLE)));
+
+        Win32Api.SetWindowPos(
+            handle.Handle,
+            new IntPtr(-1),
+            0, 0,
+            screenWidth, screenHeight,
+            Win32Api.SWP_NOACTIVATE | 0x0020);
     }
 
     public void SetCrosshairSettings(CrosshairSettings settings)

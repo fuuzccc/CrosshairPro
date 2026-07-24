@@ -29,6 +29,16 @@ public static class Win32Api
     public const int SW_HIDE = 0;
     public const int SW_SHOW = 5;
 
+    public const int SM_CXSCREEN = 0;
+    public const int SM_CYSCREEN = 1;
+
+    public const uint SWP_NOZORDER = 0x0004;
+    public const uint SWP_NOACTIVATE = 0x0010;
+
+    public const int GWL_STYLE = -16;
+    public const uint WS_POPUP = 0x80000000;
+    public const uint WS_VISIBLE = 0x10000000;
+
     #endregion
 
     #region Delegates
@@ -99,6 +109,16 @@ public static class Win32Api
 
     [DllImport("user32.dll")]
     public static extern IntPtr GetForegroundWindow();
+
+    [DllImport("user32.dll")]
+    public static extern int GetSystemMetrics(int nIndex);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
+
+    [DllImport("user32.dll")]
+    public static extern IntPtr GetDesktopWindow();
 
     #endregion
 
