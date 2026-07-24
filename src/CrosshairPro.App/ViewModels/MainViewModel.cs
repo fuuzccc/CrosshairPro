@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using CrosshairPro.Core.Services;
 using CrosshairPro.Core.Models;
 using System.Collections.ObjectModel;
+using CrosshairPro.App.Helpers;
 
 namespace CrosshairPro.App.ViewModels;
 
@@ -31,12 +32,14 @@ public partial class MainViewModel : ObservableObject
     public ObservableCollection<string> MonitorOptions { get; } = new() { "主显示器" };
     public ObservableCollection<string> ThemeOptions { get; } = new() { "深色", "浅色" };
     public ObservableCollection<string> LanguageOptions { get; } = new() { "简体中文", "English" };
-    public ObservableCollection<string> MouseButtonOptions { get; } = new() { "鼠标右键", "鼠标左键", "鼠标中键" };
     public ObservableCollection<string> TriggerModeOptions { get; } = new() { "长按", "短按", "双击" };
+
+    public List<string> AllHotkeyDisplayOptions { get; }
+    private readonly List<string> _hotkeyValues;
 
     public string DeveloperName => "fuuzccc";
     public string DeveloperGithub => "https://github.com/fuuzccc";
-    public string AppVersion => "v1.3.0";
+    public string AppVersion => "v1.4.0";
 
     public bool MinimizeToTray
     {
@@ -156,30 +159,33 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    public int SelectedMouseButtonIndex
+    public int SelectedHotkeyIndex
     {
         get
         {
-            return _settingsService.Settings.HotkeyMouseButton switch
+            var current = _settingsService.Settings.HotkeyMouseButton;
+            for (int i = 0; i < _hotkeyValues.Count; i++)
             {
-                "Right" => 0,
-                "Left" => 1,
-                "Middle" => 2,
-                _ => 0
-            };
+                if (_hotkeyValues[i] == current)
+                    return i;
+            }
+            return 0;
         }
         set
         {
-            var button = value switch
+            if (value >= 0 && value < _hotkeyValues.Count)
             {
-                0 => "Right",
-                1 => "Left",
-                2 => "Middle",
-                _ => "Right"
-            };
-            _settingsService.UpdateAppSettings(s => s.HotkeyMouseButton = button);
-            OnPropertyChanged();
-            StatusMessage = "热键鼠标按键已更新";
+                var hotkey = _hotkeyValues[value];
+                _settingsService.UpdateAppSettings(s => s.HotkeyMouseButton = hotkey);
+                OnPropertyChanged();
+                StatusMessage = "热键已更新";
+
+                if (_settingsService.Settings.EnableMouseHook)
+                {
+                    _mouseHookService.UninstallHook();
+                    _mouseHookService.InstallHook();
+                }
+            }
         }
     }
 
@@ -233,6 +239,16 @@ public partial class MainViewModel : ObservableObject
         _crosshairService = crosshairService;
         _mouseHookService = mouseHookService;
         _presetService = presetService;
+
+        var displayOptions = new List<string>();
+        var values = new List<string>();
+        foreach (var key in Win32Api.AllKeys)
+        {
+            displayOptions.Add(key.Name);
+            values.Add(key.Code.ToString());
+        }
+        AllHotkeyDisplayOptions = displayOptions;
+        _hotkeyValues = values;
 
         _settingsService.Load();
 
@@ -362,7 +378,7 @@ public partial class MainViewModel : ObservableObject
         OnPropertyChanged(nameof(CrosshairScale));
         OnPropertyChanged(nameof(RightClickHoldThresholdMs));
         OnPropertyChanged(nameof(SelectedThemeIndex));
-        OnPropertyChanged(nameof(SelectedMouseButtonIndex));
+        OnPropertyChanged(nameof(SelectedHotkeyIndex));
         OnPropertyChanged(nameof(SelectedTriggerModeIndex));
         OnPropertyChanged(nameof(IsLongPressMode));
         OnPropertyChanged(nameof(HotkeyClickCount));

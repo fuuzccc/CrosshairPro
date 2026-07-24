@@ -24,7 +24,15 @@ public partial class App : Application
         services.AddSingleton<ISettingsService, SettingsService>();
         services.AddSingleton<IPresetService, PresetService>();
         services.AddSingleton<ICrosshairService, CrosshairService>();
-        services.AddSingleton<IMouseHookService, MouseHookService>();
+
+        if (OperatingSystem.IsWindows())
+        {
+            services.AddSingleton<IMouseHookService, WindowsHookService>();
+        }
+        else
+        {
+            services.AddSingleton<IMouseHookService, MouseHookService>();
+        }
 
         services.AddTransient<MainViewModel>();
 
