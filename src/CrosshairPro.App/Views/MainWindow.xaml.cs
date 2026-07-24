@@ -13,7 +13,13 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        SetWindowIcon();
+        try
+        {
+            SetWindowIcon();
+        }
+        catch
+        {
+        }
     }
 
     private void SetWindowIcon()
@@ -25,6 +31,17 @@ public partial class MainWindow : Window
         }
         catch
         {
+            try
+            {
+                var iconStream = typeof(MainWindow).Assembly.GetManifestResourceStream("CrosshairPro.App.Assets.app_icon.png");
+                if (iconStream != null)
+                {
+                    Icon = new WindowIcon(iconStream);
+                }
+            }
+            catch
+            {
+            }
         }
     }
 
@@ -32,59 +49,84 @@ public partial class MainWindow : Window
     {
         base.OnLoaded(e);
 
-        if (DataContext is MainViewModel vm)
+        try
         {
-            _trayIconService.Initialize(
-                this,
-                () => vm.IsCrosshairEnabled,
-                () => vm.ToggleCrosshairCommand.Execute(null),
-                () => ShowMainWindow(),
-                () => ExitApp()
-            );
-
-            vm.PropertyChanged += (s, e) =>
+            if (DataContext is MainViewModel vm)
             {
-                if (e.PropertyName == nameof(MainViewModel.IsCrosshairEnabled))
+                _trayIconService.Initialize(
+                    this,
+                    () => vm.IsCrosshairEnabled,
+                    () => vm.ToggleCrosshairCommand.Execute(null),
+                    () => ShowMainWindow(),
+                    () => ExitApp()
+                );
+
+                vm.PropertyChanged += (s, e) =>
                 {
-                    _trayIconService.UpdateToolTip($"CrosshairPro - {(vm.IsCrosshairEnabled ? "准星已开启" : "准星已关闭")}");
+                    if (e.PropertyName == nameof(MainViewModel.IsCrosshairEnabled))
+                    {
+                        _trayIconService.UpdateToolTip($"CrosshairPro - {(vm.IsCrosshairEnabled ? "准星已开启" : "准星已关闭")}");
+                    }
+                };
+
+                _trayIconService.UpdateToolTip($"CrosshairPro - {(vm.IsCrosshairEnabled ? "准星已开启" : "准星已关闭")}");
+
+                if (vm.StartMinimized)
+                {
+                    Hide();
                 }
-            };
-
-            _trayIconService.UpdateToolTip($"CrosshairPro - {(vm.IsCrosshairEnabled ? "准星已开启" : "准星已关闭")}");
-
-            if (vm.StartMinimized)
-            {
-                Hide();
             }
+        }
+        catch
+        {
         }
     }
 
     protected override void OnClosing(WindowClosingEventArgs e)
     {
-        if (DataContext is MainViewModel vm && vm.MinimizeToTray)
+        try
         {
-            e.Cancel = true;
-            Hide();
+            if (DataContext is MainViewModel vm && vm.MinimizeToTray)
+            {
+                e.Cancel = true;
+                Hide();
+            }
+            else
+            {
+                _trayIconService.Remove();
+                base.OnClosing(e);
+            }
         }
-        else
+        catch
         {
-            _trayIconService.Remove();
             base.OnClosing(e);
         }
     }
 
     private void ShowMainWindow()
     {
-        Show();
-        WindowState = WindowState.Normal;
-        Activate();
-        Topmost = true;
-        Topmost = false;
+        try
+        {
+            Show();
+            WindowState = WindowState.Normal;
+            Activate();
+            Topmost = true;
+            Topmost = false;
+        }
+        catch
+        {
+        }
     }
 
     private void ExitApp()
     {
-        _trayIconService.Remove();
+        try
+        {
+            _trayIconService.Remove();
+        }
+        catch
+        {
+        }
         Close();
     }
 }

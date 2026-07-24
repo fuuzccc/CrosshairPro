@@ -8,7 +8,6 @@ public class TrayIconService
 {
     private TrayIcon? _trayIcon;
     private Window? _mainWindow;
-    private Func<bool>? _getCrosshairState;
     private Action? _toggleCrosshair;
     private Action? _showMainWindow;
     private Action? _exitApp;
@@ -21,12 +20,42 @@ public class TrayIconService
         Action exitApp)
     {
         _mainWindow = mainWindow;
-        _getCrosshairState = getCrosshairState;
         _toggleCrosshair = toggleCrosshair;
         _showMainWindow = showMainWindow;
         _exitApp = exitApp;
 
-        var icon = new WindowIcon(AssetLoader.Open(new Uri("avares://CrosshairPro.App/Assets/app_icon.png")));
+        try
+        {
+            CreateTrayIcon();
+        }
+        catch
+        {
+        }
+    }
+
+    private void CreateTrayIcon()
+    {
+        WindowIcon? icon = null;
+
+        try
+        {
+            var iconStream = AssetLoader.Open(new Uri("avares://CrosshairPro.App/Assets/app_icon.png"));
+            icon = new WindowIcon(iconStream);
+        }
+        catch
+        {
+            try
+            {
+                var iconStream = typeof(TrayIconService).Assembly.GetManifestResourceStream("CrosshairPro.App.Assets.app_icon.png");
+                if (iconStream != null)
+                {
+                    icon = new WindowIcon(iconStream);
+                }
+            }
+            catch
+            {
+            }
+        }
 
         _trayIcon = new TrayIcon
         {
@@ -54,8 +83,11 @@ public class TrayIconService
 
         _trayIcon.Clicked += OnTrayIconClicked;
 
-        var icons = TrayIcon.GetIcons(Application.Current!);
-        icons?.Add(_trayIcon);
+        if (Application.Current != null)
+        {
+            var icons = TrayIcon.GetIcons(Application.Current);
+            icons?.Add(_trayIcon);
+        }
     }
 
     private void OnTrayIconClicked(object? sender, EventArgs e)
@@ -67,20 +99,32 @@ public class TrayIconService
     {
         if (_trayIcon != null)
         {
-            _trayIcon.ToolTipText = text;
+            try
+            {
+                _trayIcon.ToolTipText = text;
+            }
+            catch
+            {
+            }
         }
     }
 
     public void Remove()
     {
-        if (_trayIcon != null && Application.Current != null)
+        try
         {
-            var icons = TrayIcon.GetIcons(Application.Current);
-            if (icons != null && icons.Contains(_trayIcon))
+            if (_trayIcon != null && Application.Current != null)
             {
-                icons.Remove(_trayIcon);
+                var icons = TrayIcon.GetIcons(Application.Current);
+                if (icons != null && icons.Contains(_trayIcon))
+                {
+                    icons.Remove(_trayIcon);
+                }
+                _trayIcon = null;
             }
-            _trayIcon = null;
+        }
+        catch
+        {
         }
     }
 }
