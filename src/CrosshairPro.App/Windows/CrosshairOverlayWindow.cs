@@ -87,7 +87,7 @@ public class CrosshairOverlayWindow : Window
             new IntPtr(-1),
             0, 0,
             screenWidth, screenHeight,
-            Win32Api.SWP_NOACTIVATE | 0x0020);
+            Win32Api.SWP_NOACTIVATE);
     }
 
     public void SetCrosshairSettings(CrosshairSettings settings)
