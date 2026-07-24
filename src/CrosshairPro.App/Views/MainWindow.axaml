@@ -17,7 +17,7 @@
       <Grid ColumnDefinitions="Auto, *, Auto">
         <StackPanel Grid.Column="0" Orientation="Horizontal">
           <TextBlock Text="CrosshairPro" FontSize="18" FontWeight="Bold" Foreground="#007ACC"/>
-          <TextBlock Text=" v1.1" FontSize="12" Foreground="Gray" VerticalAlignment="Center" Margin="5,0,0,0"/>
+          <TextBlock Text=" v1.2" FontSize="12" Foreground="Gray" VerticalAlignment="Center" Margin="5,0,0,0"/>
         </StackPanel>
         <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
           <TextBlock Text="{Binding StatusMessage}" VerticalAlignment="Center" Margin="0,0,15,0" Foreground="LightGray"/>
@@ -225,14 +225,34 @@
             <!-- 鼠标设置 -->
             <Border Background="#252526" CornerRadius="8" Padding="15">
               <StackPanel Spacing="12">
-                <TextBlock Text="鼠标设置" FontWeight="SemiBold" FontSize="14"/>
+                <TextBlock Text="热键设置" FontWeight="SemiBold" FontSize="14"/>
 
-                <CheckBox Content="启用鼠标钩子（长按右键开关）" IsChecked="{Binding EnableMouseHook, Mode=TwoWay}"/>
+                <CheckBox Content="启用鼠标热键" IsChecked="{Binding EnableMouseHook, Mode=TwoWay}"/>
 
-                <StackPanel Spacing="5" IsEnabled="{Binding EnableMouseHook}">
-                  <TextBlock Text="长按阈值（毫秒）"/>
-                  <Slider Value="{Binding RightClickHoldThresholdMs, Mode=TwoWay}" Minimum="100" Maximum="2000" SmallChange="50" LargeChange="100"/>
-                  <TextBlock Text="{Binding RightClickHoldThresholdMs}" HorizontalAlignment="Center"/>
+                <StackPanel Spacing="8" IsEnabled="{Binding EnableMouseHook}">
+
+                  <StackPanel Spacing="5">
+                    <TextBlock Text="触发按键"/>
+                    <ComboBox ItemsSource="{Binding MouseButtonOptions}" SelectedIndex="{Binding SelectedMouseButtonIndex, Mode=TwoWay}"/>
+                  </StackPanel>
+
+                  <StackPanel Spacing="5">
+                    <TextBlock Text="触发方式"/>
+                    <ComboBox ItemsSource="{Binding TriggerModeOptions}" SelectedIndex="{Binding SelectedTriggerModeIndex, Mode=TwoWay}"/>
+                  </StackPanel>
+
+                  <StackPanel Spacing="5" IsVisible="{Binding IsLongPressMode}">
+                    <TextBlock Text="时间阈值（毫秒）"/>
+                    <Slider Value="{Binding RightClickHoldThresholdMs, Mode=TwoWay}" Minimum="100" Maximum="2000" SmallChange="50" LargeChange="100"/>
+                    <TextBlock Text="{Binding RightClickHoldThresholdMs}" HorizontalAlignment="Center"/>
+                  </StackPanel>
+
+                  <StackPanel Spacing="5" IsVisible="{Binding !IsLongPressMode}">
+                    <TextBlock Text="连击次数"/>
+                    <Slider Value="{Binding HotkeyClickCount, Mode=TwoWay}" Minimum="2" Maximum="5" SmallChange="1" LargeChange="1"/>
+                    <TextBlock Text="{Binding HotkeyClickCount}" HorizontalAlignment="Center"/>
+                  </StackPanel>
+
                 </StackPanel>
               </StackPanel>
             </Border>
@@ -251,6 +271,21 @@
                   <TextBlock Text="语言"/>
                   <ComboBox ItemsSource="{Binding LanguageOptions}" SelectedIndex="0"/>
                 </StackPanel>
+              </StackPanel>
+            </Border>
+
+            <!-- 关于 -->
+            <Border Background="#252526" CornerRadius="8" Padding="15">
+              <StackPanel Spacing="8">
+                <TextBlock Text="关于" FontWeight="SemiBold" FontSize="14"/>
+                <Grid ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto, Auto">
+                  <TextBlock Grid.Row="0" Grid.Column="0" Text="版本：" Foreground="Gray"/>
+                  <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding AppVersion}"/>
+                  <TextBlock Grid.Row="1" Grid.Column="0" Text="开发者：" Foreground="Gray"/>
+                  <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding DeveloperName}"/>
+                  <TextBlock Grid.Row="2" Grid.Column="0" Text="GitHub：" Foreground="Gray"/>
+                  <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding DeveloperGithub}" Foreground="#007ACC"/>
+                </Grid>
               </StackPanel>
             </Border>
 

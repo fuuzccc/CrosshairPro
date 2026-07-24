@@ -7,9 +7,11 @@ public class MouseHookService : IMouseHookService
 {
     private readonly ISettingsService _settingsService;
     private bool _isHookInstalled;
-    private bool _isRightButtonDown;
-    private Stopwatch? _rightButtonStopwatch;
+    private bool _isButtonDown;
+    private Stopwatch? _buttonStopwatch;
     private bool _hasTriggeredLongPress;
+    private DateTime _lastClickTime = DateTime.MinValue;
+    private int _clickCount;
 
     public bool IsHookInstalled => _isHookInstalled;
 
@@ -28,7 +30,7 @@ public class MouseHookService : IMouseHookService
             return;
 
         _isHookInstalled = true;
-        _rightButtonStopwatch = new Stopwatch();
+        _buttonStopwatch = new Stopwatch();
     }
 
     public void UninstallHook()
@@ -37,36 +39,98 @@ public class MouseHookService : IMouseHookService
             return;
 
         _isHookInstalled = false;
-        _rightButtonStopwatch?.Stop();
-        _rightButtonStopwatch = null;
+        _buttonStopwatch?.Stop();
+        _buttonStopwatch = null;
     }
 
     public void SetHoldThresholdMs(int milliseconds)
     {
-        // 阈值会在下次检测时从 settings 中读取
+    }
+
+    public void SimulateButtonDown(string button)
+    {
+        if (!_isHookInstalled)
+            return;
+
+        var targetButton = _settingsService.Settings.HotkeyMouseButton;
+        if (button != targetButton)
+            return;
+
+        _isButtonDown = true;
+        _hasTriggeredLongPress = false;
+        _buttonStopwatch?.Restart();
+        RightButtonPressed?.Invoke(this, EventArgs.Empty);
+
+        var triggerMode = _settingsService.Settings.HotkeyTriggerMode;
+        if (triggerMode == "LongPress")
+        {
+            _ = CheckLongPressAsync();
+        }
+    }
+
+    public void SimulateButtonUp(string button)
+    {
+        if (!_isHookInstalled)
+            return;
+
+        var targetButton = _settingsService.Settings.HotkeyMouseButton;
+        if (button != targetButton)
+            return;
+
+        _isButtonDown = false;
+        _buttonStopwatch?.Stop();
+        RightButtonReleased?.Invoke(this, EventArgs.Empty);
+
+        var triggerMode = _settingsService.Settings.HotkeyTriggerMode;
+        if (triggerMode == "ShortPress")
+        {
+            CheckShortPress();
+        }
+        else if (triggerMode == "DoubleClick")
+        {
+            CheckDoubleClick();
+        }
     }
 
     public void SimulateRightButtonDown()
     {
-        if (!_isHookInstalled)
-            return;
-
-        _isRightButtonDown = true;
-        _hasTriggeredLongPress = false;
-        _rightButtonStopwatch?.Restart();
-        RightButtonPressed?.Invoke(this, EventArgs.Empty);
-
-        _ = CheckLongPressAsync();
+        SimulateButtonDown("Right");
     }
 
     public void SimulateRightButtonUp()
     {
-        if (!_isHookInstalled)
-            return;
+        SimulateButtonUp("Right");
+    }
 
-        _isRightButtonDown = false;
-        _rightButtonStopwatch?.Stop();
-        RightButtonReleased?.Invoke(this, EventArgs.Empty);
+    private void CheckShortPress()
+    {
+        var threshold = _settingsService.Settings.RightClickHoldThresholdMs;
+        if (_buttonStopwatch?.ElapsedMilliseconds < threshold)
+        {
+            RightButtonLongPressed?.Invoke(this, EventArgs.Empty);
+        }
+    }
+
+    private void CheckDoubleClick()
+    {
+        var now = DateTime.Now;
+        var doubleClickThreshold = 300;
+
+        if ((now - _lastClickTime).TotalMilliseconds <= doubleClickThreshold)
+        {
+            _clickCount++;
+            if (_clickCount >= _settingsService.Settings.HotkeyClickCount)
+            {
+                RightButtonLongPressed?.Invoke(this, EventArgs.Empty);
+                _clickCount = 0;
+            }
+        }
+        else
+        {
+            _clickCount = 1;
+        }
+
+        _lastClickTime = now;
     }
 
     private async Task CheckLongPressAsync()
@@ -77,7 +141,7 @@ public class MouseHookService : IMouseHookService
         {
             await Task.Delay(threshold);
 
-            if (_isRightButtonDown && _isHookInstalled && !_hasTriggeredLongPress)
+            if (_isButtonDown && _isHookInstalled && !_hasTriggeredLongPress)
             {
                 _hasTriggeredLongPress = true;
                 RightButtonLongPressed?.Invoke(this, EventArgs.Empty);
@@ -85,7 +149,6 @@ public class MouseHookService : IMouseHookService
         }
         catch
         {
-            // 忽略任务取消等异常
         }
     }
 }

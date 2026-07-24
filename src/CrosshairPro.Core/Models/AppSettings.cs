@@ -6,9 +6,15 @@ public class AppSettings
 {
     public CrosshairSettings Crosshair { get; set; } = new();
 
-    public bool IsCrosshairEnabled { get; set; } = true;
+    public bool IsCrosshairEnabled { get; set; } = false;
 
     public int RightClickHoldThresholdMs { get; set; } = 500;
+
+    public string HotkeyMouseButton { get; set; } = "Right";
+
+    public string HotkeyTriggerMode { get; set; } = "LongPress";
+
+    public int HotkeyClickCount { get; set; } = 2;
 
     public bool StartMinimized { get; set; } = false;
 

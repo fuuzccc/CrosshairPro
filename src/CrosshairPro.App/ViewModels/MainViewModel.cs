@@ -31,6 +31,12 @@ public partial class MainViewModel : ObservableObject
     public ObservableCollection<string> MonitorOptions { get; } = new() { "主显示器" };
     public ObservableCollection<string> ThemeOptions { get; } = new() { "深色", "浅色" };
     public ObservableCollection<string> LanguageOptions { get; } = new() { "简体中文", "English" };
+    public ObservableCollection<string> MouseButtonOptions { get; } = new() { "鼠标右键", "鼠标左键", "鼠标中键" };
+    public ObservableCollection<string> TriggerModeOptions { get; } = new() { "长按", "短按", "双击" };
+
+    public string DeveloperName => "fuuzccc";
+    public string DeveloperGithub => "https://github.com/fuuzccc";
+    public string AppVersion => "v1.2.0";
 
     public bool MinimizeToTray
     {
@@ -147,6 +153,73 @@ public partial class MainViewModel : ObservableObject
             _settingsService.UpdateAppSettings(s => s.Theme = theme);
             OnPropertyChanged();
             StatusMessage = "主题已更改，重启后生效";
+        }
+    }
+
+    public int SelectedMouseButtonIndex
+    {
+        get
+        {
+            return _settingsService.Settings.HotkeyMouseButton switch
+            {
+                "Right" => 0,
+                "Left" => 1,
+                "Middle" => 2,
+                _ => 0
+            };
+        }
+        set
+        {
+            var button = value switch
+            {
+                0 => "Right",
+                1 => "Left",
+                2 => "Middle",
+                _ => "Right"
+            };
+            _settingsService.UpdateAppSettings(s => s.HotkeyMouseButton = button);
+            OnPropertyChanged();
+            StatusMessage = "热键鼠标按键已更新";
+        }
+    }
+
+    public int SelectedTriggerModeIndex
+    {
+        get
+        {
+            return _settingsService.Settings.HotkeyTriggerMode switch
+            {
+                "LongPress" => 0,
+                "ShortPress" => 1,
+                "DoubleClick" => 2,
+                _ => 0
+            };
+        }
+        set
+        {
+            var mode = value switch
+            {
+                0 => "LongPress",
+                1 => "ShortPress",
+                2 => "DoubleClick",
+                _ => "LongPress"
+            };
+            _settingsService.UpdateAppSettings(s => s.HotkeyTriggerMode = mode);
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(IsLongPressMode));
+            StatusMessage = "触发方式已更新";
+        }
+    }
+
+    public bool IsLongPressMode => _settingsService.Settings.HotkeyTriggerMode == "LongPress" || _settingsService.Settings.HotkeyTriggerMode == "ShortPress";
+
+    public int HotkeyClickCount
+    {
+        get => _settingsService.Settings.HotkeyClickCount;
+        set
+        {
+            _settingsService.UpdateAppSettings(s => s.HotkeyClickCount = value);
+            OnPropertyChanged();
         }
     }
 
@@ -289,6 +362,10 @@ public partial class MainViewModel : ObservableObject
         OnPropertyChanged(nameof(CrosshairScale));
         OnPropertyChanged(nameof(RightClickHoldThresholdMs));
         OnPropertyChanged(nameof(SelectedThemeIndex));
+        OnPropertyChanged(nameof(SelectedMouseButtonIndex));
+        OnPropertyChanged(nameof(SelectedTriggerModeIndex));
+        OnPropertyChanged(nameof(IsLongPressMode));
+        OnPropertyChanged(nameof(HotkeyClickCount));
         StatusMessage = "设置已重置为默认值";
     }
 
