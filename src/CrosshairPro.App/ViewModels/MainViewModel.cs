@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CrosshairPro.Core.Services;
 using CrosshairPro.Core.Models;
+using System.Collections.ObjectModel;
 
 namespace CrosshairPro.App.ViewModels;
 
@@ -21,8 +22,133 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private string _statusMessage = "准备就绪";
 
+    [ObservableProperty]
+    private int _selectedTabIndex;
+
     public IReadOnlyList<CrosshairPreset> BuiltInPresets { get; }
     public IReadOnlyList<CrosshairPreset> CustomPresets { get; }
+
+    public ObservableCollection<string> MonitorOptions { get; } = new() { "主显示器" };
+    public ObservableCollection<string> ThemeOptions { get; } = new() { "深色", "浅色" };
+    public ObservableCollection<string> LanguageOptions { get; } = new() { "简体中文", "English" };
+
+    public bool MinimizeToTray
+    {
+        get => _settingsService.Settings.MinimizeToTray;
+        set
+        {
+            _settingsService.UpdateAppSettings(s => s.MinimizeToTray = value);
+            OnPropertyChanged();
+        }
+    }
+
+    public bool ShowInTaskbar
+    {
+        get => _settingsService.Settings.ShowInTaskbar;
+        set
+        {
+            _settingsService.UpdateAppSettings(s => s.ShowInTaskbar = value);
+            OnPropertyChanged();
+        }
+    }
+
+    public bool AlwaysOnTop
+    {
+        get => _settingsService.Settings.AlwaysOnTop;
+        set
+        {
+            _settingsService.UpdateAppSettings(s => s.AlwaysOnTop = value);
+            OnPropertyChanged();
+        }
+    }
+
+    public bool StartMinimized
+    {
+        get => _settingsService.Settings.StartMinimized;
+        set
+        {
+            _settingsService.UpdateAppSettings(s => s.StartMinimized = value);
+            OnPropertyChanged();
+        }
+    }
+
+    public bool AutoStart
+    {
+        get => _settingsService.Settings.AutoStart;
+        set
+        {
+            _settingsService.UpdateAppSettings(s => s.AutoStart = value);
+            OnPropertyChanged();
+            if (value)
+                StatusMessage = "开机自启已启用（需管理员权限）";
+            else
+                StatusMessage = "开机自启已关闭";
+        }
+    }
+
+    public bool EnableMouseHook
+    {
+        get => _settingsService.Settings.EnableMouseHook;
+        set
+        {
+            _settingsService.UpdateAppSettings(s => s.EnableMouseHook = value);
+            OnPropertyChanged();
+            if (value)
+            {
+                _mouseHookService.InstallHook();
+                StatusMessage = "鼠标钩子已启用";
+            }
+            else
+            {
+                _mouseHookService.UninstallHook();
+                StatusMessage = "鼠标钩子已关闭";
+            }
+        }
+    }
+
+    public double WindowOpacity
+    {
+        get => _settingsService.Settings.WindowOpacity;
+        set
+        {
+            _settingsService.UpdateAppSettings(s => s.WindowOpacity = value);
+            OnPropertyChanged();
+        }
+    }
+
+    public double CrosshairScale
+    {
+        get => _settingsService.Settings.CrosshairScale;
+        set
+        {
+            _settingsService.UpdateAppSettings(s => s.CrosshairScale = value);
+            OnPropertyChanged();
+            _crosshairService.UpdateSettings(CrosshairSettings.ToModel());
+        }
+    }
+
+    public int RightClickHoldThresholdMs
+    {
+        get => _settingsService.Settings.RightClickHoldThresholdMs;
+        set
+        {
+            _settingsService.UpdateAppSettings(s => s.RightClickHoldThresholdMs = value);
+            OnPropertyChanged();
+            _mouseHookService.SetHoldThresholdMs(value);
+        }
+    }
+
+    public int SelectedThemeIndex
+    {
+        get => _settingsService.Settings.Theme == "Dark" ? 0 : 1;
+        set
+        {
+            var theme = value == 0 ? "Dark" : "Light";
+            _settingsService.UpdateAppSettings(s => s.Theme = theme);
+            OnPropertyChanged();
+            StatusMessage = "主题已更改，重启后生效";
+        }
+    }
 
     public MainViewModel(
         ISettingsService settingsService,
@@ -50,13 +176,17 @@ public partial class MainViewModel : ObservableObject
         };
 
         _mouseHookService.RightButtonLongPressed += OnRightButtonLongPressed;
+        _mouseHookService.SetHoldThresholdMs(_settingsService.Settings.RightClickHoldThresholdMs);
 
         if (_isCrosshairEnabled)
         {
             _crosshairService.Show();
         }
 
-        _mouseHookService.InstallHook();
+        if (_settingsService.Settings.EnableMouseHook)
+        {
+            _mouseHookService.InstallHook();
+        }
     }
 
     [RelayCommand]
@@ -105,16 +235,19 @@ public partial class MainViewModel : ObservableObject
         StatusMessage = $"预设已保存: {preset.Name}";
     }
 
+    [ObservableProperty]
+    private string _importCode = string.Empty;
+
     [RelayCommand]
-    private void ImportFromCode(string? code)
+    private void ImportFromCode()
     {
-        if (string.IsNullOrWhiteSpace(code))
+        if (string.IsNullOrWhiteSpace(ImportCode))
         {
             StatusMessage = "请输入 CS2 准星代码";
             return;
         }
 
-        var settings = _presetService.ImportFromCs2Code(code);
+        var settings = _presetService.ImportFromCs2Code(ImportCode);
         if (settings != null)
         {
             CrosshairSettings = new CrosshairSettingsViewModel(settings);
@@ -136,6 +269,27 @@ public partial class MainViewModel : ObservableObject
     {
         ExportedCode = _presetService.ExportToCs2Code(CrosshairSettings.ToModel());
         StatusMessage = "准星代码已生成，可复制使用";
+    }
+
+    [RelayCommand]
+    private void ResetSettings()
+    {
+        var defaultSettings = new AppSettings();
+        _settingsService.Reset();
+        _settingsService.Load();
+        CrosshairSettings = new CrosshairSettingsViewModel(_settingsService.Settings.Crosshair);
+        IsCrosshairEnabled = _settingsService.Settings.IsCrosshairEnabled;
+        OnPropertyChanged(nameof(MinimizeToTray));
+        OnPropertyChanged(nameof(ShowInTaskbar));
+        OnPropertyChanged(nameof(AlwaysOnTop));
+        OnPropertyChanged(nameof(StartMinimized));
+        OnPropertyChanged(nameof(AutoStart));
+        OnPropertyChanged(nameof(EnableMouseHook));
+        OnPropertyChanged(nameof(WindowOpacity));
+        OnPropertyChanged(nameof(CrosshairScale));
+        OnPropertyChanged(nameof(RightClickHoldThresholdMs));
+        OnPropertyChanged(nameof(SelectedThemeIndex));
+        StatusMessage = "设置已重置为默认值";
     }
 
     private void OnRightButtonLongPressed(object? sender, EventArgs e)

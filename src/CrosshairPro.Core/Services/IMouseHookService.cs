@@ -13,4 +13,6 @@ public interface IMouseHookService
     void InstallHook();
 
     void UninstallHook();
+
+    void SetHoldThresholdMs(int milliseconds);
 }

@@ -12,6 +12,8 @@ public interface ISettingsService
 
     void Save();
 
+    void Reset();
+
     void UpdateCrosshairSettings(CrosshairSettings settings);
 
     void UpdateAppSettings(Action<AppSettings> updateAction);

@@ -41,6 +41,11 @@ public class MouseHookService : IMouseHookService
         _rightButtonStopwatch = null;
     }
 
+    public void SetHoldThresholdMs(int milliseconds)
+    {
+        // 阈值会在下次检测时从 settings 中读取
+    }
+
     public void SimulateRightButtonDown()
     {
         if (!_isHookInstalled)

@@ -70,6 +70,16 @@ public class SettingsService : ISettingsService
         OnSettingsChanged();
     }
 
+    public void Reset()
+    {
+        if (File.Exists(_settingsPath))
+        {
+            File.Delete(_settingsPath);
+        }
+        _settings = new AppSettings();
+        OnSettingsChanged();
+    }
+
     protected virtual void OnSettingsChanged()
     {
         SettingsChanged?.Invoke(this, EventArgs.Empty);
