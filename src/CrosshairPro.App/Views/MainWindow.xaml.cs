@@ -9,6 +9,7 @@ namespace CrosshairPro.App.Views;
 public partial class MainWindow : Window
 {
     private readonly TrayIconService _trayIconService = new();
+    private bool _isExiting;
 
     public MainWindow()
     {
@@ -86,6 +87,13 @@ public partial class MainWindow : Window
     {
         try
         {
+            if (_isExiting)
+            {
+                _trayIconService.Remove();
+                base.OnClosing(e);
+                return;
+            }
+
             if (DataContext is MainViewModel vm && vm.MinimizeToTray)
             {
                 e.Cancel = true;
@@ -122,6 +130,7 @@ public partial class MainWindow : Window
     {
         try
         {
+            _isExiting = true;
             _trayIconService.Remove();
         }
         catch
