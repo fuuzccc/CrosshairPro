@@ -10,7 +10,7 @@ public class AppSettings
 
     public int RightClickHoldThresholdMs { get; set; } = 500;
 
-    public string HotkeyMouseButton { get; set; } = "112";
+    public string HotkeyMouseButton { get; set; } = "4";
 
     public string HotkeyTriggerMode { get; set; } = "LongPress";
 

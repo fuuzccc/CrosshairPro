@@ -4,6 +4,7 @@ using Avalonia.Media;
 using CrosshairPro.App.Helpers;
 using CrosshairPro.App.ViewModels;
 using CrosshairPro.Core.Models;
+using System.ComponentModel;
 
 namespace CrosshairPro.App.Controls;
 
@@ -21,6 +22,28 @@ public class CrosshairPreview : Control
     static CrosshairPreview()
     {
         AffectsRender<CrosshairPreview>(SettingsProperty);
+    }
+
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+
+        if (change.Property == SettingsProperty)
+        {
+            if (change.OldValue is INotifyPropertyChanged oldVm)
+            {
+                oldVm.PropertyChanged -= OnSettingsPropertyChanged;
+            }
+            if (change.NewValue is INotifyPropertyChanged newVm)
+            {
+                newVm.PropertyChanged += OnSettingsPropertyChanged;
+            }
+        }
+    }
+
+    private void OnSettingsPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        InvalidateVisual();
     }
 
     public override void Render(DrawingContext context)

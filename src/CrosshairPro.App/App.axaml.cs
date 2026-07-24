@@ -46,6 +46,18 @@ public partial class App : Application
             {
                 DataContext = mainVm
             };
+
+            desktop.Exit += (s, e) =>
+            {
+                try
+                {
+                    var hookService = Services.GetService<IMouseHookService>();
+                    hookService?.UninstallHook();
+                }
+                catch
+                {
+                }
+            };
         }
 
         base.OnFrameworkInitializationCompleted();

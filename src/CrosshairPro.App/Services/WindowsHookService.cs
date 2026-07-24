@@ -75,12 +75,7 @@ public class WindowsHookService : IMouseHookService
 
     private IntPtr SetHook(int idHook, Win32Api.LowLevelProc proc)
     {
-        using var curProcess = Process.GetCurrentProcess();
-        using var curModule = curProcess.MainModule;
-        if (curModule == null || curModule.ModuleName == null)
-            return IntPtr.Zero;
-
-        return Win32Api.SetWindowsHookEx(idHook, proc, Win32Api.GetModuleHandle(curModule.ModuleName), 0);
+        return Win32Api.SetWindowsHookEx(idHook, proc, IntPtr.Zero, 0);
     }
 
     private IntPtr MouseHookProc(int nCode, IntPtr wParam, IntPtr lParam)
@@ -148,11 +143,19 @@ public class WindowsHookService : IMouseHookService
     private uint GetTargetVirtualKey()
     {
         var hotkey = _settingsService.Settings.HotkeyMouseButton;
+
         if (uint.TryParse(hotkey, out var vk))
         {
             return vk;
         }
-        return 0x7B;
+
+        return hotkey switch
+        {
+            "Left" => 0x01,
+            "Right" => 0x02,
+            "Middle" => 0x04,
+            _ => 0x04
+        };
     }
 
     private void HandleButtonDown()
