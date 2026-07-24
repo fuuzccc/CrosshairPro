@@ -24,4 +24,8 @@
     <ProjectReference Include="..\CrosshairPro.Core\CrosshairPro.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <AvaloniaResource Include="Assets\**" />
+  </ItemGroup>
+
 </Project>
