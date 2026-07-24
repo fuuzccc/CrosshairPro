@@ -2,6 +2,15 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="CrosshairPro.App.App"
              RequestedThemeVariant="Dark">
+    <Application.Resources>
+        <Color x:Key="AppHeaderBackground">#FF2D2D30</Color>
+        <Color x:Key="AppSurfaceBackground">#FF252526</Color>
+        <Color x:Key="AppSurfaceDark">#FF1E1E1E</Color>
+        <Color x:Key="AppAccentColor">#FF007ACC</Color>
+        <Color x:Key="AppTextMuted">#FF808080</Color>
+        <Color x:Key="AppTextSecondary">#FFD3D3D3</Color>
+        <Color x:Key="AppDangerColor">#FFC62828</Color>
+    </Application.Resources>
     <Application.Styles>
         <FluentTheme />
     </Application.Styles>

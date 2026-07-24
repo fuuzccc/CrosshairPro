@@ -126,6 +126,17 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
+    public bool AutoResetCrosshairPosition
+    {
+        get => _settingsService.Settings.AutoResetCrosshairPosition;
+        set
+        {
+            _settingsService.UpdateAppSettings(s => s.AutoResetCrosshairPosition = value);
+            OnPropertyChanged();
+            StatusMessage = value ? "开启准星时自动复位已启用" : "开启准星时自动复位已关闭";
+        }
+    }
+
     public float CrosshairOffsetX
     {
         get => _settingsService.Settings.Crosshair.OffsetX;
@@ -354,6 +365,17 @@ public partial class MainViewModel : ObservableObject
 
         if (IsCrosshairEnabled)
         {
+            if (_settingsService.Settings.AutoResetCrosshairPosition)
+            {
+                _settingsService.UpdateAppSettings(s =>
+                {
+                    s.Crosshair.OffsetX = 0;
+                    s.Crosshair.OffsetY = 0;
+                });
+                OnPropertyChanged(nameof(CrosshairOffsetX));
+                OnPropertyChanged(nameof(CrosshairOffsetY));
+                _crosshairService.UpdateSettings(_settingsService.Settings.Crosshair);
+            }
             _crosshairService.Show();
             StatusMessage = "准星已开启";
         }
@@ -444,6 +466,7 @@ public partial class MainViewModel : ObservableObject
         OnPropertyChanged(nameof(AutoStart));
         OnPropertyChanged(nameof(EnableMouseHook));
         OnPropertyChanged(nameof(EnableDragCrosshair));
+        OnPropertyChanged(nameof(AutoResetCrosshairPosition));
         OnPropertyChanged(nameof(CrosshairOffsetX));
         OnPropertyChanged(nameof(CrosshairOffsetY));
         OnPropertyChanged(nameof(WindowOpacity));

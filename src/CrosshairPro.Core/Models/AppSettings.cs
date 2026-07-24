@@ -46,5 +46,7 @@ public class AppSettings
 
     public bool EnableDragCrosshair { get; set; } = true;
 
+    public bool AutoResetCrosshairPosition { get; set; } = true;
+
     public string Language { get; set; } = "zh-CN";
 }
