@@ -39,7 +39,7 @@ public partial class MainViewModel : ObservableObject
 
     public string DeveloperName => "fuuzccc";
     public string DeveloperGithub => "https://github.com/fuuzccc";
-    public string AppVersion => "v1.4.0";
+    public string AppVersion => "v1.4.4";
 
     public bool MinimizeToTray
     {
