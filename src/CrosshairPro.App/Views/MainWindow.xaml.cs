@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using CrosshairPro.App.Services;
 using CrosshairPro.App.ViewModels;
@@ -76,10 +77,36 @@ public partial class MainWindow : Window
                 {
                     Hide();
                 }
+
+                _ = LoadDeveloperAvatarAsync();
             }
         }
         catch
         {
+        }
+    }
+
+    private async Task LoadDeveloperAvatarAsync()
+    {
+        try
+        {
+            var avatarUrl = "https://github.com/fuuzccc.png";
+            var httpClient = new System.Net.Http.HttpClient();
+            var imageBytes = await httpClient.GetByteArrayAsync(avatarUrl);
+            var stream = new System.IO.MemoryStream(imageBytes);
+            var bitmap = new Bitmap(stream);
+            DeveloperAvatar.Source = bitmap;
+        }
+        catch
+        {
+            try
+            {
+                var fallbackStream = AssetLoader.Open(new Uri("avares://CrosshairPro.App/Assets/app_icon.png"));
+                DeveloperAvatar.Source = new Bitmap(fallbackStream);
+            }
+            catch
+            {
+            }
         }
     }
 
@@ -136,6 +163,21 @@ public partial class MainWindow : Window
         catch
         {
         }
-        Close();
+
+        try
+        {
+            if (Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop)
+            {
+                desktop.Shutdown();
+            }
+            else
+            {
+                Close();
+            }
+        }
+        catch
+        {
+            Close();
+        }
     }
 }

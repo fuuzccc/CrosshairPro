@@ -66,16 +66,19 @@ public class CrosshairService : ICrosshairService
 
         _overlayWindow = new CrosshairOverlayWindow();
 
-        var primaryScreen = GetPrimaryScreen();
-        if (primaryScreen != null)
-        {
-            var bounds = primaryScreen.Bounds;
-            _overlayWindow.UpdatePosition(
-                new PixelPoint(bounds.X, bounds.Y),
-                new Size(bounds.Width, bounds.Height));
-        }
-
         _overlayWindow.SetCrosshairSettings(_settingsService.Settings.Crosshair);
+
+        _overlayWindow.Opened += (s, e) =>
+        {
+            var primaryScreen = GetPrimaryScreen();
+            if (primaryScreen != null)
+            {
+                var bounds = primaryScreen.Bounds;
+                _overlayWindow.UpdatePosition(
+                    new PixelPoint(bounds.X, bounds.Y),
+                    new Size(bounds.Width, bounds.Height));
+            }
+        };
     }
 
     private Screen? GetPrimaryScreen()

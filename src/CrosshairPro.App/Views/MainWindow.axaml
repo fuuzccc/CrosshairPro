@@ -276,15 +276,20 @@
 
             <!-- 关于 -->
             <Border Background="#252526" CornerRadius="8" Padding="15">
-              <StackPanel Spacing="8">
+              <StackPanel Spacing="12">
                 <TextBlock Text="关于" FontWeight="SemiBold" FontSize="14"/>
                 <Grid ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto, Auto">
-                  <TextBlock Grid.Row="0" Grid.Column="0" Text="版本：" Foreground="Gray"/>
-                  <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding AppVersion}"/>
-                  <TextBlock Grid.Row="1" Grid.Column="0" Text="开发者：" Foreground="Gray"/>
-                  <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding DeveloperName}"/>
-                  <TextBlock Grid.Row="2" Grid.Column="0" Text="GitHub：" Foreground="Gray"/>
-                  <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding DeveloperGithub}" Foreground="#007ACC"/>
+                  <Image Grid.Row="0" Grid.RowSpan="3" Grid.Column="0" Width="60" Height="60" Margin="0,0,15,0" Name="DeveloperAvatar">
+                    <Image.Clip>
+                      <EllipseGeometry RadiusX="30" RadiusY="30" Center="30,30"/>
+                    </Image.Clip>
+                  </Image>
+                  <TextBlock Grid.Row="0" Grid.Column="1" Text="版本：" Foreground="Gray"/>
+                  <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding AppVersion}" Margin="50,0,0,0"/>
+                  <TextBlock Grid.Row="1" Grid.Column="1" Text="开发者：" Foreground="Gray"/>
+                  <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding DeveloperName}" Margin="50,0,0,0"/>
+                  <TextBlock Grid.Row="2" Grid.Column="1" Text="GitHub：" Foreground="Gray"/>
+                  <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding DeveloperGithub}" Foreground="#007ACC" Margin="50,0,0,0"/>
                 </Grid>
               </StackPanel>
             </Border>

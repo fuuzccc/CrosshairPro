@@ -41,7 +41,16 @@ public class CrosshairOverlayWindow : Window
             IsHitTestVisible = false
         };
 
-        Content = _crosshairOverlay;
+        var panel = new Panel
+        {
+            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
+            VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch,
+            IsHitTestVisible = false,
+            Margin = new Thickness(0)
+        };
+
+        panel.Children.Add(_crosshairOverlay);
+        Content = panel;
 
         _crosshairOverlay.Bind(CrosshairOverlay.SettingsProperty,
             this.GetObservable(CrosshairSettingsProperty));
@@ -54,6 +63,7 @@ public class CrosshairOverlayWindow : Window
         try
         {
             WindowHelper.MakeClickThrough(this);
+            _crosshairOverlay.InvalidateVisual();
         }
         catch
         {
@@ -63,6 +73,7 @@ public class CrosshairOverlayWindow : Window
     public void SetCrosshairSettings(CrosshairSettings settings)
     {
         CrosshairSettings = settings;
+        _crosshairOverlay.InvalidateVisual();
     }
 
     public void UpdatePosition(PixelPoint position, Size size)
@@ -70,5 +81,6 @@ public class CrosshairOverlayWindow : Window
         Position = position;
         Width = size.Width;
         Height = size.Height;
+        _crosshairOverlay.InvalidateVisual();
     }
 }
