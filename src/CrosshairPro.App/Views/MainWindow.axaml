@@ -1,0 +1,184 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:CrosshairPro.App.ViewModels"
+        xmlns:controls="using:CrosshairPro.App.Controls"
+        xmlns:system="using:System"
+        x:Class="CrosshairPro.App.Views.MainWindow"
+        x:DataType="vm:MainViewModel"
+        Title="CrosshairPro - CS2 准星工具"
+        Width="900" Height="650"
+        MinWidth="800" MinHeight="550"
+        Icon="/Assets/avatar.png">
+  <Design.DataContext>
+    <vm:MainViewModel/>
+  </Design.DataContext>
+
+  <Grid RowDefinitions="Auto, *, Auto">
+    <!-- 顶部状态栏 -->
+    <Border Grid.Row="0" Background="#2D2D30" Padding="15,10">
+      <Grid ColumnDefinitions="Auto, *, Auto">
+        <StackPanel Grid.Column="0" Orientation="Horizontal">
+          <TextBlock Text="CrosshairPro" FontSize="18" FontWeight="Bold" Foreground="#007ACC"/>
+          <TextBlock Text=" v1.0" FontSize="12" Foreground="Gray" VerticalAlignment="Center" Margin="5,0,0,0"/>
+        </StackPanel>
+        <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
+          <TextBlock Text="{Binding StatusMessage}" VerticalAlignment="Center" Margin="0,0,15,0" Foreground="LightGray"/>
+          <Button Content="显示/隐藏准星" Command="{Binding ToggleCrosshairCommand}" Classes="Accent"/>
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <!-- 主体内容 -->
+    <Grid Grid.Row="1" Margin="15">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="280"/>
+        <ColumnDefinition Width="*"/>
+      </Grid.ColumnDefinitions>
+
+      <!-- 左侧：预设列表 -->
+      <Border Grid.Column="0" CornerRadius="8" Padding="10" Background="#252526">
+        <Grid RowDefinitions="Auto, *, Auto">
+          <TextBlock Grid.Row="0" Text="预设列表" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
+
+          <ScrollViewer Grid.Row="1">
+            <StackPanel Spacing="8">
+              <TextBlock Text="内置预设" FontWeight="SemiBold" Foreground="Gray" Margin="0,5,0,3"/>
+              <ItemsControl ItemsSource="{Binding BuiltInPresets}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate>
+                    <Button Content="{Binding Name}"
+                            Command="{Binding $parent[Window].DataContext.ApplyPresetCommand}"
+                            CommandParameter="{Binding}"
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Left"
+                            Margin="0,2"/>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </ScrollViewer>
+
+          <StackPanel Grid.Row="2" Margin="0,10,0,0" Spacing="5">
+            <Button Content="保存当前为预设" Command="{Binding SavePresetCommand}"/>
+          </StackPanel>
+        </Grid>
+      </Border>
+
+      <!-- 右侧：设置面板 -->
+      <Border Grid.Column="1" CornerRadius="8" Padding="15" Background="#252526" Margin="10,0,0,0">
+        <ScrollViewer>
+          <StackPanel Spacing="15">
+            <TextBlock Text="准星设置" FontSize="18" FontWeight="Bold"/>
+
+            <!-- 准星预览 -->
+            <Border Background="#1E1E1E" CornerRadius="8" Padding="15" HorizontalAlignment="Center">
+              <controls:CrosshairPreview Width="200" Height="200" Settings="{Binding CrosshairSettings}"/>
+            </Border>
+
+            <!-- 基本设置 -->
+            <TextBlock Text="基本设置" FontWeight="SemiBold" FontSize="14"/>
+
+            <Grid ColumnDefinitions="*, *">
+              <StackPanel Spacing="5" Margin="0,0,7,0">
+                <TextBlock Text="准星大小"/>
+                <Slider Value="{Binding CrosshairSettings.Size, Mode=TwoWay}" Minimum="0.5" Maximum="10" SmallChange="0.1" LargeChange="0.5"/>
+                <TextBlock Text="{Binding CrosshairSettings.Size}" HorizontalAlignment="Center"/>
+              </StackPanel>
+              <StackPanel Spacing="5" Grid.Column="1" Margin="7,0,0,0">
+                <TextBlock Text="线条粗细"/>
+                <Slider Value="{Binding CrosshairSettings.Thickness, Mode=TwoWay}" Minimum="0.5" Maximum="5" SmallChange="0.1" LargeChange="0.5"/>
+                <TextBlock Text="{Binding CrosshairSettings.Thickness}" HorizontalAlignment="Center"/>
+              </StackPanel>
+            </Grid>
+
+            <Grid ColumnDefinitions="*, *">
+              <StackPanel Spacing="5" Margin="0,0,7,0">
+                <TextBlock Text="间隙"/>
+                <Slider Value="{Binding CrosshairSettings.Gap, Mode=TwoWay}" Minimum="-5" Maximum="10" SmallChange="0.1" LargeChange="1"/>
+                <TextBlock Text="{Binding CrosshairSettings.Gap}" HorizontalAlignment="Center"/>
+              </StackPanel>
+              <StackPanel Spacing="5" Grid.Column="1" Margin="7,0,0,0">
+                <TextBlock Text="中心点大小"/>
+                <Slider Value="{Binding CrosshairSettings.CenterDotSize, Mode=TwoWay}" Minimum="0.5" Maximum="5" SmallChange="0.1" LargeChange="0.5"/>
+                <TextBlock Text="{Binding CrosshairSettings.CenterDotSize}" HorizontalAlignment="Center"/>
+              </StackPanel>
+            </Grid>
+
+            <!-- 开关选项 -->
+            <StackPanel Spacing="8">
+              <CheckBox Content="显示中心点" IsChecked="{Binding CrosshairSettings.HasCenterDot, Mode=TwoWay}"/>
+              <CheckBox Content="T型准星" IsChecked="{Binding CrosshairSettings.IsTShaped, Mode=TwoWay}"/>
+              <CheckBox Content="显示描边" IsChecked="{Binding CrosshairSettings.HasOutline, Mode=TwoWay}"/>
+            </StackPanel>
+
+            <!-- 描边厚度 -->
+            <StackPanel Spacing="5" IsEnabled="{Binding CrosshairSettings.HasOutline}">
+              <TextBlock Text="描边厚度"/>
+              <Slider Value="{Binding CrosshairSettings.OutlineThickness, Mode=TwoWay}" Minimum="0.5" Maximum="3" SmallChange="0.1" LargeChange="0.5"/>
+              <TextBlock Text="{Binding CrosshairSettings.OutlineThickness}" HorizontalAlignment="Center"/>
+            </StackPanel>
+
+            <!-- 颜色设置 -->
+            <TextBlock Text="颜色设置" FontWeight="SemiBold" FontSize="14" Margin="0,10,0,0"/>
+
+            <StackPanel Spacing="8">
+              <TextBlock Text="预设颜色"/>
+              <ComboBox ItemsSource="{Binding ColorPresets}"
+                        SelectedItem="{Binding CrosshairSettings.ColorPreset, Mode=TwoWay}">
+                <ComboBox.ItemTemplate>
+                  <DataTemplate>
+                    <TextBlock Text="{Binding Name}"/>
+                  </DataTemplate>
+                </ComboBox.ItemTemplate>
+              </ComboBox>
+            </StackPanel>
+
+            <Grid ColumnDefinitions="*, *, *">
+              <StackPanel Spacing="5" Margin="0,0,5,0">
+                <TextBlock Text="R"/>
+                <TextBox Text="{Binding CrosshairSettings.ColorR, Mode=TwoWay}"/>
+              </StackPanel>
+              <StackPanel Spacing="5" Grid.Column="1" Margin="5,0">
+                <TextBlock Text="G"/>
+                <TextBox Text="{Binding CrosshairSettings.ColorG, Mode=TwoWay}"/>
+              </StackPanel>
+              <StackPanel Spacing="5" Grid.Column="2" Margin="5,0,0,0">
+                <TextBlock Text="B"/>
+                <TextBox Text="{Binding CrosshairSettings.ColorB, Mode=TwoWay}"/>
+              </StackPanel>
+            </Grid>
+
+            <StackPanel Spacing="5">
+              <TextBlock Text="透明度"/>
+              <Slider Value="{Binding CrosshairSettings.Alpha, Mode=TwoWay}" Minimum="0" Maximum="255" SmallChange="1" LargeChange="10"/>
+              <TextBlock Text="{Binding CrosshairSettings.Alpha}" HorizontalAlignment="Center"/>
+            </StackPanel>
+
+            <!-- CS2 代码导入导出 -->
+            <TextBlock Text="CS2 代码" FontWeight="SemiBold" FontSize="14" Margin="0,10,0,0"/>
+
+            <StackPanel Spacing="8">
+              <TextBox Text="{Binding ImportCode, Mode=TwoWay}"
+                       Watermark="粘贴 CS2 准星代码（sharecode 或 cl_crosshair* 命令）"
+                       AcceptsReturn="True" TextWrapping="Wrap"
+                       Height="60"/>
+              <StackPanel Orientation="Horizontal" Spacing="10">
+                <Button Content="导入代码" Command="{Binding ImportCodeCommand}" Classes="Accent"/>
+                <Button Content="导出代码" Command="{Binding ExportCurrentCodeCommand}"/>
+              </StackPanel>
+              <TextBlock Text="{Binding ExportedCode}" TextWrapping="Wrap" Foreground="LightGray"/>
+            </StackPanel>
+
+            <!-- 快捷键说明 -->
+            <TextBlock Text="提示：长按鼠标右键可快速开关准星" Foreground="Gray" FontSize="12" Margin="0,10,0,0"/>
+          </StackPanel>
+        </ScrollViewer>
+      </Border>
+    </Grid>
+
+    <!-- 底部状态栏 -->
+    <Border Grid.Row="2" Background="#2D2D30" Padding="15,8">
+      <TextBlock Text="CrosshairPro © 2024 | 准星覆盖工具" Foreground="Gray" FontSize="11" HorizontalAlignment="Center"/>
+    </Border>
+  </Grid>
+</Window>

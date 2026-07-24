@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{201E911A-2B50-4324-AB0A-7FD99107DE8D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrosshairPro.Core", "src\CrosshairPro.Core\CrosshairPro.Core.csproj", "{76BACF16-B66A-4D60-908A-F8295F8F1930}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrosshairPro.App", "src\CrosshairPro.App\CrosshairPro.App.csproj", "{1A1F4D30-DC58-4F28-A71A-B44824550791}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{76BACF16-B66A-4D60-908A-F8295F8F1930}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{76BACF16-B66A-4D60-908A-F8295F8F1930}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76BACF16-B66A-4D60-908A-F8295F8F1930}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{76BACF16-B66A-4D60-908A-F8295F8F1930}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1A1F4D30-DC58-4F28-A71A-B44824550791}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A1F4D30-DC58-4F28-A71A-B44824550791}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A1F4D30-DC58-4F28-A71A-B44824550791}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A1F4D30-DC58-4F28-A71A-B44824550791}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{76BACF16-B66A-4D60-908A-F8295F8F1930} = {201E911A-2B50-4324-AB0A-7FD99107DE8D}
+		{1A1F4D30-DC58-4F28-A71A-B44824550791} = {201E911A-2B50-4324-AB0A-7FD99107DE8D}
+	EndGlobalSection
+EndGlobal
